@@ -1,26 +1,42 @@
-from flask import Flask 
+from flask import Flask, render_template, request
 import mysql.connector # importo o mysql connector
 # AREA PARA BIBLIOTECAS
-conexao = mysql.connector.connect(host='localhost', 
-                                  database='chamada_escolar', 
-                                  user='root', 
-                                  password='JoãoVictor15') #trocar isso dps por uma hash
-if conexao.is_connected():
-    print('conetado ao banco de dados!')
-    cursor = conexao.cursor()
-
-cursor.execute('select * from usuario')
-r = cursor.fetchone()
-for r in cursor:
-    print(r)
-
-
-cursor.close()
-conexao.close()
 
 app = Flask(__name__)
 # AREA DAS FUNÇÕES
+@app.route('/', methods=['POST', 'GET'])
+def fazer_login():
+    if request.method == 'POST':
+        conexao = mysql.connector.connect(host='localhost', 
+                                  database='chamada_escolar', 
+                                  user='root', 
+                                  password='JoãoVictor15') #trocar isso dps por uma hash
+        if conexao.is_connected():
+            print('conetado ao banco de dados!')
 
+        cursor = conexao.cursor()
+        matricula = request.form['matricula']
+        if len(matricula) == 14:
+            cursor.close()
+            conexao.close()
+            return 'Aluno'
+            
+            
+        else:
+            
+            nome = 'João Victor de Oliveira Moreira'
+            senha = request.form['password']
+            sql = 'INSERT INTO chamada_escolar.usuario (matricula, senha, tipo, nome) VALUES (%s, %s, %s, %s)'
+            valores = (matricula, senha, 'prof', nome)
+            cursor.execute(sql, valores)
+            conexao.commit()
+
+            cursor.close()
+            conexao.close()
+            return 'Professor cadastrado com sucesso!'
+        
+
+    return render_template('login.html')
 
 # AREA PARA RODAR
 if __name__=='__main__':
