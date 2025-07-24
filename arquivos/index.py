@@ -4,7 +4,8 @@ import mysql.connector # importo o mysql connector
 
 app = Flask(__name__)
 # AREA DAS FUNÇÕES
-@app.route('/', methods=['POST', 'GET'])
+
+@app.route('/login', methods=['POST', 'GET'])
 def fazer_login():
     if request.method == 'POST':
         conexao = mysql.connector.connect(host='localhost', 
@@ -37,6 +38,18 @@ def fazer_login():
         
 
     return render_template('login.html')
+
+@app.route('/cadastrar', methods=['POST', 'GET'])
+def cadastrar():
+    if request.method == 'POST':
+        conexao = mysql.connector.connect(host='localhost', 
+                                  database='chamada_escolar', 
+                                  user='root', 
+                                  password='JoãoVictor15') #trocar isso dps por uma hash
+        if conexao.is_connected():
+            print('conetado ao banco de dados!')
+    else:
+        return render_template('cadastrar.html')
 
 # AREA PARA RODAR
 if __name__=='__main__':

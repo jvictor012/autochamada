@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar</title>
+</head>
+<body>
+</body>
+    <h1>Não tem uma conta? Faça seu cadastro:</h1>
+    <form action="/cadastrar">
+        <p><label for="icadastrar_nome">Nome:</input> <input  type='text' name="cadastrar_nome" id="icadastrar_nome" placeholder="Digite seu nome"></label></label></p>
+        <p><label for="icadastrar_matricula">Matrícula: </label><input type="text" name="cadastrar_matricula" id="icadastrar_matricula" placeholder="Digite sua matrícula"></input>
+        </p>
+        <p><label for="icadastrar_senha">Senha: </label><input type="password" name="cadastrar_senha" id="icadastrar_senha" placeholder="Digite sua senha"></input></p>
+    </form>
+    <a href="{{ url_for('fazer_login') }}">Já tenho uma conta</a>
+</body>
+</html>
