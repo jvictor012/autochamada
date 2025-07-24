@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
-import mysql.connector # importo o mysql connector
+import mysql.connector
+import bcrypt
 # AREA PARA BIBLIOTECAS
 
 app = Flask(__name__)
@@ -7,8 +8,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST', 'GET'])
 def fazer_login():
-    if request.method == 'POST':
-        conexao = mysql.connector.connect(host='localhost', 
+
+    return render_template('login.html')
+
+@app.route('/cadastrar', methods=['POST', 'GET'])
+def cadastrar():
+   if request.method == 'POST':
+        conexao = mysql.connector.connect(host='172.31.240.1', 
                                   database='chamada_escolar', 
                                   user='root', 
                                   password='JoãoVictor15') #trocar isso dps por uma hash
@@ -16,40 +22,32 @@ def fazer_login():
             print('conetado ao banco de dados!')
 
         cursor = conexao.cursor()
-        matricula = request.form['matricula']
+        matricula = request.form['cadastro_matricula']
+        senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+        nome = request.form['cadastro_nome']
+        senha = request.form['cadastro_password']
         if len(matricula) == 14:
+            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo) VALUES (%s, %s, %s, %s)'
+            valores = (nome, matricula, senha_hash, 'aluno' )
+            cursor.execute(sql, valores)
+            conexao.commit()
             cursor.close()
             conexao.close()
-            return 'Aluno'
-            
-            
+            msg = f'Aluno {nome} cadastrado com sucesso!'
+            return render_template('cadastrar.html', msg=msg)
+
+
         else:
-            
-            nome = 'João Victor de Oliveira Moreira'
-            senha = request.form['password']
-            sql = 'INSERT INTO chamada_escolar.usuario (matricula, senha, tipo, nome) VALUES (%s, %s, %s, %s)'
-            valores = (matricula, senha, 'prof', nome)
+            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo) VALUES (%s, %s, %s, %s)'
+            valores = (nome, matricula, senha_hash, 'prof' )
             cursor.execute(sql, valores)
             conexao.commit()
 
             cursor.close()
             conexao.close()
-            return 'Professor cadastrado com sucesso!'
-        
+            msg = f'Professor {nome} cadastrado com sucesso!'
+            return render_template('cadastrar.html', msg=msg)
 
-    return render_template('login.html')
-
-@app.route('/cadastrar', methods=['POST', 'GET'])
-def cadastrar():
-    if request.method == 'POST':
-        conexao = mysql.connector.connect(host='localhost', 
-                                  database='chamada_escolar', 
-                                  user='root', 
-                                  password='JoãoVictor15') #trocar isso dps por uma hash
-        if conexao.is_connected():
-            print('conetado ao banco de dados!')
-    else:
-        return render_template('cadastrar.html')
 
 # AREA PARA RODAR
 if __name__=='__main__':

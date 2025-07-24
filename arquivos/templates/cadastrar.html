@@ -1,19 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar</title>
+  <meta charset="UTF-8">
+  <title>Cadastro</title>
+  <style>
+    body {
+      background-color: black;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .cadastro-container {
+      background-color: #6EB680;
+      padding: 30px;
+      border-radius: 10px;
+      width: 320px;
+      color: black;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: black;
+      color: #6EB680;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .voltar-link {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: black;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-</body>
-    <h1>Não tem uma conta? Faça seu cadastro:</h1>
-    <form action="/cadastrar">
-        <p><label for="icadastrar_nome">Nome:</input> <input  type='text' name="cadastrar_nome" id="icadastrar_nome" placeholder="Digite seu nome"></label></label></p>
-        <p><label for="icadastrar_matricula">Matrícula: </label><input type="text" name="cadastrar_matricula" id="icadastrar_matricula" placeholder="Digite sua matrícula"></input>
-        </p>
-        <p><label for="icadastrar_senha">Senha: </label><input type="password" name="cadastrar_senha" id="icadastrar_senha" placeholder="Digite sua senha"></input></p>
+  <div class="cadastro-container">
+    <h2>Cadastro</h2>
+    <form action="/cadastrar" id="cadastroForm" method="POST">
+      <label for="inome">Nome completo:</label>
+      <input type="text" nome="cadastro_nome" id="inome" required>
+
+      <label for="imatricula">Matrícula:</label>
+      <input type="text" nome="cadastro_matricula" id="imatricula" required>
+
+      <label for="isenha">Senha:</label>
+      <input type="password" nome="cadastro_password" id="isenha" required>
+
+      <button type="submit">Cadastrar</button>
     </form>
-    <a href="{{ url_for('fazer_login') }}">Já tenho uma conta</a>
+    <a class="voltar-link" href="{{ url_for('fazer_login') }}" >Voltar ao login</a>
+  </div>
+  </script>
 </body>
 </html>
