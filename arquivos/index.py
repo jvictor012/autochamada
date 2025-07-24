@@ -5,7 +5,7 @@ import mysql.connector # importo o mysql connector
 app = Flask(__name__)
 # AREA DAS FUNÇÕES
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/', methods=['POST', 'GET'])
 def fazer_login():
     if request.method == 'POST':
         conexao = mysql.connector.connect(host='localhost', 
