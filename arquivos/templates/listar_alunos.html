@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar_alunos</title>
+</head>
+<body>
+    {% for aluno in alunos %}
+    <p>Nome: {{ aluno.nome }}</p>
+    <p>Matrícula: {{ aluno.matricula }}</p>
+    <p>Tag: {{ aluno.tag }}</p>
+    <p>faltas: {{ aluno.falta }} <form method="POST", action="editar">
+        <label for="ieditar">Número de faltas: </label><input type="number" id="ieditar" name="editar">  <button type="submit">Remover Faltas</button>
+    </form></p>
+    <p>Aulas Vistas: {{ aluno.aulas_vistas }}</p>
+    <p>Percentual: {{ aluno.percentual }}</p>
+    <hr>
+{% endfor %}
+</body>
+</html>
