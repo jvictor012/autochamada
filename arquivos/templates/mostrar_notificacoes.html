@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listar_alunos</title>
 </head>
+<a href="{{ url_for('cadastrar_aluno') }}">Voltar</a>
 <body>
     {% for notificacao in notificacoes %}
     <p>Nome do aluno: {{ notificacao.aluno }}</p>
