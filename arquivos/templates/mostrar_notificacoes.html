@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar_alunos</title>
+</head>
+<body>
+    {% for notificacao in notificacoes %}
+    <p>Nome do aluno: {{ notificacao.aluno }}</p>
+    <p>Matrícula do aluno: {{ notificacao.matricula_aluno }}</p>
+    <p>Justificativa do aluno: {{ notificacao.justificativa }}</p>
+    <p>Professor destinado: {{ notificacao.matricula_professor_destinado }}</p>
+    <hr>
+{% endfor %}
+</body>
+</html>

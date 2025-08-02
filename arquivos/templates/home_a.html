@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
 <body>
-    Bem vindo! Aluno {{ msg }}
+    <h1>Bem vindo! Aluno {{ nome_banco }}</h1>
+
+    <p>Justifique sua falta!</p>
+    <form action="/justificar_falta" method="POST">
+        <label for="imatricula">Matricula: </label><input id="imatricula" name="matricula" maxlength="14" minlength="14"> 
+        <label for="imatricula_p">Matricula Professor: </label><input id="imatricula_p" name="matricula_p" maxlength="6" minlength="6"> 
+        <label for="ijustificar_falta">Motivo: </label><input id="ijustificar_falta" name="justificar_falta" type="text">
+        <button type="submit">Enviar</button>
+    </form>
+    {{ msg }}
 </body>
 </html>

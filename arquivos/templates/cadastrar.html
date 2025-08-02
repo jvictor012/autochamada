@@ -68,7 +68,7 @@
       <input type="text" name="cadastro_nome" id="inome" required>
 
       <label for="imatricula">Matrícula:</label>
-      <input type="text" name="cadastro_matricula" id="imatricula" required>
+      <input type="text" name="cadastro_matricula" id="imatricula" required maxlength="14" minlength="6">
 
       <label for="isenha">Senha:</label>
       <input type="password" name="cadastro_password" id="isenha" required>
@@ -77,6 +77,6 @@
     </form>
     <a class="voltar-link" href="{{ url_for('fazer_login') }}" >Voltar ao login</a>
   </div>
-  </script>
+  {{ msg }}
 </body>
 </html>

@@ -8,6 +8,68 @@ app = Flask(__name__)
 app.secret_key = 'os_trombadinhas'
 
 # AREA DAS FUNÇÕES
+@app.route('/cadastrar', methods=['POST', 'GET'])
+def cadastrar():
+    if request.method == 'POST':
+        conexao = mysql.connector.connect(
+            host='localhost',
+            database='chamada_escolar',
+            user='root',
+            password='JoãoVictor15'  # trocar isso dps por uma hash
+        )
+
+        if conexao.is_connected():
+            print('Conectado ao banco de dados!')
+
+        cursor = conexao.cursor()
+        matricula = request.form['cadastro_matricula']
+        nome = request.form['cadastro_nome']
+        senha = request.form['cadastro_password']
+        senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+        carga_horaria = None
+        tag_professor = None
+
+        if len(matricula) == 14:
+            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo, carga_horaria, tag_professor) VALUES (%s, %s, %s, %s, %s, %s)'
+            valores = (nome, matricula, senha_hash, 'aluno', carga_horaria, tag_professor)
+
+            sql_a = 'SELECT matricula FROM usuario WHERE matricula = %s'
+            cursor.execute(sql_a, (matricula,))
+            resultado = cursor.fetchone()
+            if resultado:
+                if resultado[0] == matricula:
+                    msg = f'Impossível cadastrar a matricula {matricula} pois ela já está em uso!'
+                    return render_template('cadastrar.html', msg=msg)
+            cursor.execute(sql, valores)
+            conexao.commit()
+            msg = f'Aluno {nome} cadastrado com sucesso!'
+
+
+        else:
+            if len(matricula) > 6 and len(matricula) < 13:
+                msg = f'Matricula inválida!'
+                return render_template('cadastrar.html', msg=msg)
+
+            sql_a = 'SELECT matricula FROM usuario WHERE matricula = %s'
+            cursor.execute(sql_a, (matricula,))
+            resultado = cursor.fetchone()
+            if resultado:
+                if resultado[0] == matricula:
+                    msg = f'Impossível cadastrar a matricula {matricula} pois ela já está em uso!'
+                    return render_template('cadastrar.html', msg=msg)
+            
+            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo, carga_horaria, tag_professor) VALUES (%s, %s, %s, %s, %s, %s)'
+            valores = (nome, matricula, senha_hash, 'prof',carga_horaria, tag_professor)
+            cursor.execute(sql, valores)
+            conexao.commit()
+            msg = f'Professor {nome} cadastrado com sucesso!'
+
+        cursor.close()
+        conexao.close()
+        return render_template('cadastrar.html', msg=msg)
+
+    return render_template('cadastrar.html')
+
 
 @app.route('/', methods=['POST', 'GET'])
 def fazer_login():
@@ -63,51 +125,6 @@ def fazer_login():
 
 
 
-
-@app.route('/cadastrar', methods=['POST', 'GET'])
-def cadastrar():
-    if request.method == 'POST':
-        conexao = mysql.connector.connect(
-            host='localhost',
-            database='chamada_escolar',
-            user='root',
-            password='JoãoVictor15'  # trocar isso dps por uma hash
-        )
-
-        if conexao.is_connected():
-            print('Conectado ao banco de dados!')
-
-        cursor = conexao.cursor()
-        matricula = request.form['cadastro_matricula']
-        nome = request.form['cadastro_nome']
-        senha = request.form['cadastro_password']
-        senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
-        carga_horaria = None
-        tag_professor = None
-
-        if len(matricula) == 14:
-            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo, carga_horaria, tag_professor) VALUES (%s, %s, %s, %s, %s, %s)'
-            valores = (nome, matricula, senha_hash, 'aluno', carga_horaria, tag_professor)
-            cursor.execute(sql, valores)
-            conexao.commit()
-            msg = f'Aluno {nome} cadastrado com sucesso!'
-
-        else:
-            if len(matricula) > 6 and len(matricula) < 13:
-                msg = f'Matricula inválida!'
-                return render_template('cadastrar.html', msg=msg)
-            
-            sql = 'INSERT INTO chamada_escolar.usuario (nome, matricula, senha, tipo, carga_horaria, tag_professor) VALUES (%s, %s, %s, %s, %s, %s)'
-            valores = (nome, matricula, senha_hash, 'prof',carga_horaria, tag_professor)
-            cursor.execute(sql, valores)
-            conexao.commit()
-            msg = f'Professor {nome} cadastrado com sucesso!'
-
-        cursor.close()
-        conexao.close()
-        return render_template('cadastrar.html', msg=msg)
-
-    return render_template('cadastrar.html')
 
 
 
@@ -221,7 +238,7 @@ def editar():
     cursor = conexao.cursor()
 
     matricula = session.get('matricula')
-    carga_horaria = session.get('carga_horaria') or 0
+    carga_horaria = int(session.get('carga_horaria') or 0)
 
     # Buscar presenca do aluno
     sql = "SELECT presenca FROM alunos WHERE matricula = %s"
@@ -252,8 +269,100 @@ def editar():
 
     # Redireciona para listar_alunos ou renderiza com mensagem
     return render_template('cadastrar_aluno.html')
+  
 
-    
+
+@app.route('/justificar_falta', methods=['GET', 'POST'])
+def justificar_falta():
+    if request.method == 'POST':
+        conexao = mysql.connector.connect(
+            host='localhost',
+            database='chamada_escolar',
+            user='root',
+            password='JoãoVictor15'  # trocar isso depois por uma hash
+        )
+        cursor = conexao.cursor()
+        matricula = request.form['matricula']
+        matricula_professor = request.form['matricula_p']
+        justificativa = request.form['justificar_falta']
+
+        # Verifica se o professor existe
+        sql = "SELECT tipo, matricula, nome FROM usuario WHERE matricula = %s"
+        cursor.execute(sql, (matricula_professor,))
+        resultado = cursor.fetchone()
+        cursor.fetchall()  # <=== LIMPA RESULTADO ANTERIOR
+
+        if resultado:
+            tipo_usuario, _, nome_professor = resultado
+            if tipo_usuario == 'prof':
+                # Verifica se o aluno existe
+                sql = "SELECT nome FROM alunos WHERE matricula = %s"
+                cursor.execute(sql, (matricula,))
+                resultado_aluno = cursor.fetchone()
+                cursor.fetchall()  # <=== LIMPA RESULTADO ANTERIOR
+
+                if resultado_aluno:
+                    nome_aluno = resultado_aluno[0]
+
+                    # Insere justificativa
+                    sql = '''
+                        INSERT INTO chamada_escolar.notificacoes 
+                        (aluno, matricula_aluno, justificativa, matricula_professor_destinado) 
+                        VALUES (%s, %s, %s, %s)
+                    '''
+                    valores = (nome_aluno, matricula, justificativa, matricula_professor)
+                    cursor.execute(sql, valores)
+                    conexao.commit()
+
+                    msg = f'Justificativa de falta enviada para o professor {nome_professor}'
+                    cursor.close()
+                    conexao.close()
+                    return render_template('home_a.html', msg=msg)
+                else:
+                    msg = 'Aluno não encontrado! Verifique a matrícula.'
+                    cursor.close()
+                    conexao.close()
+                    return render_template('home_a.html', msg=msg)
+        else:
+            msg = 'Erro! Verifique os campos novamente!'
+            cursor.close()
+            conexao.close()
+            return render_template('home_a.html', msg=msg)
+
+    msg = 'Erro inesperado!'
+    return render_template('home_a.html', msg=msg)
+
+@app.route('/mostrar_notificacoes', methods = ['GET', 'POST'])
+def mostrar_notificacoes():
+    notificacoes = []
+    conexao = mysql.connector.connect(
+            host='localhost',
+            database='chamada_escolar',
+            user='root',
+            password='JoãoVictor15'  # trocar isso depois por uma hash
+        )
+    cursor = conexao.cursor()
+
+    sql = 'SELECT aluno, matricula_aluno, justificativa, matricula_professor_destinado FROM notificacoes WHERE matricula_professor_destinado = %s'
+    cursor.execute(sql, (session.get('matricula'),))
+    resultado = cursor.fetchall()
+
+    if resultado:
+        for aluno, matricula_aluno, justificativa, matricula_professor_destinado in resultado:
+            notificacao = {
+                'aluno': aluno,
+                'matricula_aluno': matricula_aluno,
+                'justificativa': justificativa,
+                'matricula_professor_destinado': matricula_professor_destinado
+            }
+            notificacoes.append(notificacao)
+
+
+        cursor.close()
+        conexao.close()
+    return render_template('mostrar_notificacoes.html', notificacoes=notificacoes)
+        
+    pass
 
 # AREA PARA RODAR
 if __name__ == '__main__':
