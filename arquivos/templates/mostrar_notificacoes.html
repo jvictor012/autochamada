@@ -1,18 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listar_alunos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notificações</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      padding: 30px;
+    }
+
+    a {
+      display: inline-block;
+      background-color: #6EB680;
+      color: #000;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      transition: background 0.3s;
+    }
+
+    a:hover {
+      background-color: #5ca46f;
+    }
+
+    .notificacao-card {
+      background-color: #6EB680;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .notificacao-card p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin-top: 15px;
+    }
+  </style>
 </head>
-<a href="{{ url_for('cadastrar_aluno') }}">Voltar</a>
 <body>
-    {% for notificacao in notificacoes %}
-    <p>Nome do aluno: {{ notificacao.aluno }}</p>
-    <p>Matrícula do aluno: {{ notificacao.matricula_aluno }}</p>
-    <p>Justificativa do aluno: {{ notificacao.justificativa }}</p>
-    <p>Professor destinado: {{ notificacao.matricula_professor_destinado }}</p>
-    <hr>
-{% endfor %}
+
+  <a href="{{ url_for('cadastrar_aluno') }}">Voltar</a>
+
+  {% for notificacao in notificacoes %}
+    <div class="notificacao-card">
+      <p><strong>Nome do aluno:</strong> {{ notificacao.aluno }}</p>
+      <p><strong>Matrícula do aluno:</strong> {{ notificacao.matricula_aluno }}</p>
+      <p><strong>Justificativa do aluno:</strong> {{ notificacao.justificativa }}</p>
+      <p><strong>Professor destinado:</strong> {{ notificacao.matricula_professor_destinado }}</p>
+      <hr>
+    </div>
+  {% endfor %}
+
 </body>
 </html>

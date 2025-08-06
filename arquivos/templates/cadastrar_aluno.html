@@ -1,31 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professor {{ nome_banco }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professor {{ nome_banco }}</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #6EB680;
+      padding: 40px 30px;
+      border-radius: 16px;
+      max-width: 450px;
+      width: 100%;
+      color: #000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: 2px solid black;
+      background-color: #eaf5ec;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #000;
+      color: #6EB680;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1a1a1a;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .links a {
+      display: block;
+      color: #000;
+      text-decoration: none;
+      font-weight: 500;
+      margin: 5px 0;
+      transition: color 0.2s;
+    }
+
+    .links a:hover {
+      color: #333;
+      text-decoration: underline;
+    }
+
+    .mensagem {
+      text-align: center;
+      margin-top: 15px;
+      color: #000;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
     <h1>Seja bem-vindo, Professor {{ nome_banco }}!</h1>
     <p>Cadastre um aluno no sistema:</p>
 
     <form action="/cadastrar_aluno" method="POST">
-        <p><label for="inome_aluno">Nome do Aluno: </label>
-        <input type="text" name="nome_aluno" id="inome_aluno" required></p>
+      <label for="inome_aluno">Nome do Aluno:</label>
+      <input type="text" name="nome_aluno" id="inome_aluno" required>
 
-        <p><label for="imatricula_aluno">Matrícula do Aluno: </label>
-        <input type="text" name="matricula_aluno" id="imatricula_aluno" minlength="6" maxlength="14" required></p>
+      <label for="imatricula_aluno">Matrícula do Aluno:</label>
+      <input type="text" name="matricula_aluno" id="imatricula_aluno" minlength="6" maxlength="14" required>
 
-        <p><label for="itag_aluno">Tag RFID: </label>
-        <input type="text" name="tag_aluno" id="itag_aluno" required></p>
+      <label for="itag_aluno">Tag RFID:</label>
+      <input type="text" name="tag_aluno" id="itag_aluno" required>
 
-        <p><button type="submit">Cadastrar Aluno</button></p>
+      <button type="submit">Cadastrar Aluno</button>
     </form>
 
-    <a href="{{ url_for('listar_alunos') }}">Meus alunos</a><br>
-    <a href="{{ url_for('mostrar_notificacoes') }}">Notificações</a><br>
-    <a href="{{ url_for('fazer_login') }}">Sair</a>
+    <div class="links">
+      <a href="{{ url_for('listar_alunos') }}">Meus alunos</a>
+      <a href="{{ url_for('mostrar_notificacoes') }}">Notificações</a>
+      <a href="{{ url_for('fazer_login') }}">Sair</a>
+    </div>
 
-    <p>{{ msg }}</p>
+    <p class="mensagem">{{ msg }}</p>
+  </div>
 </body>
 </html>

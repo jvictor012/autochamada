@@ -1,16 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carga Horária</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carga Horária</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #6EB680;
+      padding: 40px 30px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      color: #000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: 2px solid black;
+      background-color: #eaf5ec;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #000;
+      color: #6EB680;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1a1a1a;
+    }
+  </style>
 </head>
 <body>
-    <h1>Adicione sua TAG RFID e sua carga horária em horas!</h1>
+  <div class="container">
+    <h1>Adicione sua TAG RFID e a carga horária em horas</h1>
     <form action="/carga_horaria" method="POST">
-        <label for="icarga_horaria">Carga Horária: </label><input type="number" id="icarga_horaria" name="carga_horaria" required>
-        <label for="itag_professor">CTag RFID: </label><input type="text" id="itag_professor" name="tag_professor" required>
-        <button type="submit">Continuar</button>
+      <label for="icarga_horaria">Carga Horária:</label>
+      <input type="number" id="icarga_horaria" name="carga_horaria" required>
+
+      <label for="itag_professor">Tag RFID:</label>
+      <input type="text" id="itag_professor" name="tag_professor" required>
+
+      <button type="submit">Continuar</button>
     </form>
+  </div>
 </body>
 </html>
