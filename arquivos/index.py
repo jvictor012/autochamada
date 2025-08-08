@@ -104,7 +104,7 @@ def fazer_login():
                         session['carga_horaria'] = carga_horaria
                         if carga_horaria is None and tag_professor is None:
                             return render_template('definir_carga_horaria.html')
-                        return render_template('cadastrar_aluno.html', nome_banco=nome_banco)
+                        return render_template('home_p.html', nome_banco=nome_banco)
                     else:
                         return render_template('home_a.html', nome_banco=nome_banco)
                 else:
@@ -169,12 +169,15 @@ def carga_horaria():
                 host='localhost',
                 database='chamada_escolar',
                 user='root',
-                password='JoãoVictor15'  # trocar isso dps por uma hash
+                password='JoãoVictor15'  # trocar isso depois por uma hash segura
             )
             cursor = conexao.cursor()
-            carga_horaria = request.form.get('carga_horaria') or session.get('carga_horaria')
+
+            # Converte a carga horária recebida para float (evita erros em cálculos)
+            carga_horaria = float(request.form.get('carga_horaria') or session.get('carga_horaria') or 0)
             tag_professor = request.form['tag_professor']
 
+            # Atualiza os dados no banco
             sql1 = 'UPDATE usuario SET carga_horaria = %s WHERE matricula = %s'
             cursor.execute(sql1, (carga_horaria, session.get('matricula')))
 
@@ -182,6 +185,10 @@ def carga_horaria():
             cursor.execute(sql2, (tag_professor, session.get('matricula')))
 
             conexao.commit()
+
+            # Atualiza os dados na sessão
+            session['carga_horaria'] = carga_horaria
+            session['tag_professor'] = tag_professor
 
         finally:
             if cursor:
@@ -192,6 +199,7 @@ def carga_horaria():
         return render_template('cadastrar_aluno.html')
 
     return render_template('definir_carga_horaria.html')
+
 
 
 @app.route('/listar_alunos', methods=['GET'])
@@ -213,16 +221,18 @@ def listar_alunos():
 
         alunos = []
         carga_horaria = session.get('carga_horaria')
+        print(carga_horaria)
 
         if carga_horaria is None:
             carga_horaria = 0
 
         if resultados:
             num_aulas = carga_horaria / 0.75 if carga_horaria else 0
+            print(num_aulas)
+            print(carga_horaria)
 
             for nome, matricula, tag, presenca in resultados:
-                aulas_vistas = num_aulas - presenca if num_aulas else 0
-                percentual = f"{(aulas_vistas / num_aulas) * 100:.2f}%" if num_aulas else "N/A"
+                percentual = f"{(presenca / num_aulas) * 100:.2f}%" if num_aulas else "N/A"
 
                 aluno = {
                     'nome': nome,
@@ -230,8 +240,8 @@ def listar_alunos():
                     'tag': tag,
                     'presenca': presenca,
                     'falta': num_aulas - presenca,
+                    'total_de_aulas':num_aulas,
                     'num_aulas': num_aulas,
-                    'aulas_vistas': aulas_vistas,
                     'percentual': percentual
                 }
                 alunos.append(aluno)
@@ -267,7 +277,7 @@ def editar():
 
         if resultado:
             presenca_atual = resultado[0] or 0
-            num_aulas = carga_horaria / 0.75 if carga_horaria else 0
+            num_aulas = float(carga_horaria) / 0.75 if carga_horaria else 0
 
             falta_atual = num_aulas - presenca_atual
 
@@ -350,6 +360,10 @@ def justificar_falta():
 
     msg = 'Erro inesperado!'
     return render_template('home_a.html', msg=msg)
+
+@app.route('/homepage', methods=['GET', 'POST'])
+def home_professor():
+    return render_template('home_p.html')
 
 
 @app.route('/mostrar_notificacoes', methods=['GET', 'POST'])
