@@ -176,6 +176,7 @@ def carga_horaria():
             # Converte a carga horária recebida para float (evita erros em cálculos)
             carga_horaria = float(request.form.get('carga_horaria') or session.get('carga_horaria') or 0)
             tag_professor = request.form['tag_professor']
+            email = request.form['email_professor']
 
             # Atualiza os dados no banco
             sql1 = 'UPDATE usuario SET carga_horaria = %s WHERE matricula = %s'
@@ -184,11 +185,16 @@ def carga_horaria():
             sql2 = 'UPDATE usuario SET tag_professor = %s WHERE matricula = %s'
             cursor.execute(sql2, (tag_professor, session.get('matricula')))
 
+            sql3 = 'UPDATE usuario SET email = %s WHERE matricula = %s'
+            cursor.execute(sql3, (email, session.get('matricula')))
+
             conexao.commit()
 
             # Atualiza os dados na sessão
             session['carga_horaria'] = carga_horaria
             session['tag_professor'] = tag_professor
+            session['email'] = email
+
 
         finally:
             if cursor:
@@ -196,7 +202,7 @@ def carga_horaria():
             if conexao and conexao.is_connected():
                 conexao.close()
 
-        return render_template('cadastrar_aluno.html')
+        return render_template('home_p.html')
 
     return render_template('definir_carga_horaria.html')
 
@@ -227,20 +233,19 @@ def listar_alunos():
             carga_horaria = 0
 
         if resultados:
-            num_aulas = carga_horaria / 0.75 if carga_horaria else 0
-            print(num_aulas)
+            num_aulas = float(carga_horaria) // 0.75 if carga_horaria else 0
             print(carga_horaria)
 
             for nome, matricula, tag, presenca in resultados:
-                percentual = f"{(presenca / num_aulas) * 100:.2f}%" if num_aulas else "N/A"
+                percentual = f"{(1 - (presenca / num_aulas)) * 100:.2f}%" if num_aulas else "N/A"
 
                 aluno = {
                     'nome': nome,
                     'matricula': matricula,
                     'tag': tag,
-                    'presenca': presenca,
-                    'falta': num_aulas - presenca,
-                    'total_de_aulas':num_aulas,
+                    'presenca': f'{presenca:.2f}',
+                    'falta': f'{num_aulas - presenca:.0f}',
+                    'total_de_aulas':f'{num_aulas:.0f}',
                     'num_aulas': num_aulas,
                     'percentual': percentual
                 }
@@ -277,7 +282,7 @@ def editar():
 
         if resultado:
             presenca_atual = resultado[0] or 0
-            num_aulas = float(carga_horaria) / 0.75 if carga_horaria else 0
+            num_aulas = int(carga_horaria) / 0.75 if carga_horaria else 0
 
             falta_atual = num_aulas - presenca_atual
 
@@ -314,42 +319,45 @@ def justificar_falta():
                 password='JoãoVictor15'
             )
             cursor = conexao.cursor()
-            matricula = request.form['matricula']
-            matricula_professor = request.form['matricula_p']
+
+            matricula_aluno = request.form['matricula']  # matricula do aluno
+            email_professor = request.form['email_professor']  # email do professor
             justificativa = request.form['justificar_falta']
 
-            sql = "SELECT tipo, matricula, nome FROM usuario WHERE matricula = %s"
-            cursor.execute(sql, (matricula_professor,))
-            resultado = cursor.fetchone()
-            cursor.fetchall()  # limpa resultado
+            # Buscar matrícula do professor a partir do email
+            sql_busca_prof = "SELECT matricula, nome FROM usuario WHERE email = %s AND tipo = 'prof'"
+            cursor.execute(sql_busca_prof, (email_professor,))
+            resultado_prof = cursor.fetchone()
 
-            if resultado:
-                tipo_usuario, _, nome_professor = resultado
-                if tipo_usuario == 'prof':
-                    sql = "SELECT nome FROM alunos WHERE matricula = %s"
-                    cursor.execute(sql, (matricula,))
-                    resultado_aluno = cursor.fetchone()
-                    cursor.fetchall()  # limpa resultado
+            if resultado_prof:
+                matricula_professor = resultado_prof[0]
+                nome_professor = resultado_prof[1]
 
-                    if resultado_aluno:
-                        nome_aluno = resultado_aluno[0]
+                # Buscar nome do aluno para mostrar na notificação
+                sql_nome_aluno = "SELECT nome FROM alunos WHERE matricula = %s"
+                cursor.execute(sql_nome_aluno, (matricula_aluno,))
+                resultado_aluno = cursor.fetchone()
 
-                        sql = '''
-                            INSERT INTO chamada_escolar.notificacoes 
-                            (aluno, matricula_aluno, justificativa, matricula_professor_destinado) 
-                            VALUES (%s, %s, %s, %s)
-                        '''
-                        valores = (nome_aluno, matricula, justificativa, matricula_professor)
-                        cursor.execute(sql, valores)
-                        conexao.commit()
+                if resultado_aluno:
+                    nome_aluno = resultado_aluno[0]
 
-                        msg = f'Justificativa de falta enviada para o professor {nome_professor}'
-                        return render_template('home_a.html', msg=msg)
-                    else:
-                        msg = 'Aluno não encontrado! Verifique a matrícula.'
-                        return render_template('home_a.html', msg=msg)
+                    # Inserir notificação usando matrícula do professor
+                    sql_insert = '''
+                        INSERT INTO chamada_escolar.notificacoes 
+                        (aluno, matricula_aluno, justificativa, matricula_professor_destinado) 
+                        VALUES (%s, %s, %s, %s)
+                    '''
+                    valores = (nome_aluno, matricula_aluno, justificativa, matricula_professor)
+                    cursor.execute(sql_insert, valores)
+                    conexao.commit()
+
+                    msg = f'Justificativa de falta enviada para o professor {nome_professor}'
+                    return render_template('home_a.html', msg=msg)
+                else:
+                    msg = 'Aluno não encontrado! Verifique a matrícula.'
+                    return render_template('home_a.html', msg=msg)
             else:
-                msg = 'Erro! Verifique os campos novamente!'
+                msg = 'Professor com esse email não encontrado!'
                 return render_template('home_a.html', msg=msg)
 
         finally:
@@ -380,17 +388,18 @@ def mostrar_notificacoes():
         )
         cursor = conexao.cursor()
 
-        sql = 'SELECT aluno, matricula_aluno, justificativa, matricula_professor_destinado FROM notificacoes WHERE matricula_professor_destinado = %s'
-        cursor.execute(sql, (session.get('matricula'),))
+        sql = 'SELECT aluno, matricula_aluno, justificativa, matricula_professor_destinado,email FROM notificacoes WHERE email = %s'
+        cursor.execute(sql, (session.get('email'),))
         resultado = cursor.fetchall()
 
         if resultado:
-            for aluno, matricula_aluno, justificativa, matricula_professor_destinado in resultado:
+            for aluno, matricula_aluno, justificativa, matricula_professor_destinado,email in resultado:
                 notificacao = {
                     'aluno': aluno,
                     'matricula_aluno': matricula_aluno,
                     'justificativa': justificativa,
-                    'matricula_professor_destinado': matricula_professor_destinado
+                    'matricula_professor_destinado': matricula_professor_destinado,
+                    'email': email
                 }
                 notificacoes.append(notificacao)
 

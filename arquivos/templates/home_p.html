@@ -1,14 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage professor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professor {{ nome_banco }}</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    background-color: #6EB680;
+    padding: 60px 50px; /* Aumentei o espaçamento interno */
+    border-radius: 16px;
+    max-width: 550px; /* Aumentei a largura máxima */
+    width: 100%;
+    color: #000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    font-size: 20px; /* Aumentei a fonte dentro da caixa */
+  }
+
+  h1 {
+    font-size: 28px; /* Aumentei a fonte do título */
+    margin-bottom: 20px;
+  }
+
+  .links {
+    text-align: center;
+    margin-top: 25px;
+  }
+
+  .links a {
+    display: block;
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 8px 0;
+    font-size: 20px; /* Aumentei a fonte dos links */
+    transition: color 0.2s;
+  }
+
+  .links a:hover {
+    color: #333;
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
-    <h1>Seja bem vindo ao site de professores da INFOTECH!</h1>
-    <a href="{{ url_for('listar_alunos') }}">Meus alunos</a>
-    <a href="{{ url_for('mostrar_notificacoes') }}">Notificações</a>
-    <a href="{{ url_for('fazer_login') }}">Sair</a>
+  <div class="container">
+    <h1>Seja bem-vindo, Professor {{ nome_banco }}!</h1>
+
+    <div class="links">
+      <a href="{{ url_for('cadastrar_aluno') }}">Cadastrar um novo aluno</a>
+      <a href="{{ url_for('listar_alunos') }}">Meus alunos</a>
+      <a href="{{ url_for('mostrar_notificacoes') }}">Notificações</a>
+      <a href="{{ url_for('fazer_login') }}">Sair</a>
+    </div>
+  </div>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Área do Aluno</title>
   <style>
     * {
@@ -51,16 +51,19 @@
     }
 
     input[type="text"],
-    input[type="number"] {
+    textarea {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
       border: none;
       margin-top: 5px;
       font-size: 14px;
+      resize: vertical;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    input:focus {
+    input:focus,
+    textarea:focus {
       outline: 2px solid black;
       background-color: #eaf5ec;
     }
@@ -89,6 +92,26 @@
       color: #000;
       font-weight: 500;
     }
+
+    .btn-voltar {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      text-align: center;
+      background-color: #444;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-voltar:hover {
+      background-color: #222;
+    }
   </style>
 </head>
 <body>
@@ -99,16 +122,18 @@
 
     <form action="/justificar_falta" method="POST">
       <label for="imatricula">Matrícula:</label>
-      <input id="imatricula" name="matricula" maxlength="14" minlength="14" required>
+      <input id="imatricula" name="matricula" type="text" maxlength="14" minlength="14" required placeholder="Digite sua matrícula">
 
-      <label for="imatricula_p">Matrícula do Professor:</label>
-      <input id="imatricula_p" name="matricula_p" maxlength="6" minlength="6" required>
+      <label for="iemail_p">Email do Professor:</label>
+      <input id="iemail_p" name="email_professor" type="text" maxlength="50" minlength="6" required placeholder="Digite o email do professor">
 
       <label for="ijustificar_falta">Motivo:</label>
-      <input id="ijustificar_falta" name="justificar_falta" type="text" required>
+      <textarea id="ijustificar_falta" name="justificar_falta" maxlength="500" required placeholder="Justifique sua falta" rows="6"></textarea>
 
       <button type="submit">Enviar</button>
     </form>
+
+    <a href="{{ url_for('fazer_login') }}" class="btn-voltar">Voltar</a>
 
     <p class="mensagem">{{ msg }}</p>
   </div>

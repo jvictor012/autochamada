@@ -94,10 +94,14 @@
     }
 
     .mensagem {
+      background-color: rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 8px;
       text-align: center;
-      margin-top: 15px;
-      color: #000;
+      color: #fff;
       font-weight: 500;
+      margin-top: 15px;
+      word-wrap: break-word;
     }
   </style>
 </head>
@@ -112,11 +116,12 @@
       <input type="password" name="login_password" id='ipassword' required>
 
       <button type="submit">Entrar</button>
+      <a class="link-cadastrar" href="{{ url_for('cadastrar') }}">Ainda não tem conta? Cadastre-se</a>
     </form>
 
-    <a class="link-cadastrar" href="{{ url_for('cadastrar') }}">Ainda não tem conta? Cadastre-se</a>
-
-    <p class="mensagem">{{ msg }}</p>
+    {% if msg %}
+      <p class="mensagem">{{ msg }}</p>
+    {% endif %}
   </div>
 </body>
 </html>

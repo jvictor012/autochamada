@@ -121,6 +121,7 @@
       <label for="imatricula_aluno">Matrícula do Aluno:</label>
       <input type="text" name="matricula_aluno" id="imatricula_aluno" minlength="6" maxlength="14" required>
 
+      
       <label for="itag_aluno">Tag RFID:</label>
       <input type="text" name="tag_aluno" id="itag_aluno" required>
 
@@ -128,9 +129,7 @@
     </form>
 
     <div class="links">
-      <a href="{{ url_for('listar_alunos') }}">Meus alunos</a>
-      <a href="{{ url_for('mostrar_notificacoes') }}">Notificações</a>
-      <a href="{{ url_for('fazer_login') }}">Sair</a>
+      <a href="{{ url_for('home_professor') }}">Sair</a>
     </div>
 
     <p class="mensagem">{{ msg }}</p>
