@@ -88,7 +88,8 @@ def fazer_login():
             matricula = request.form['login_matricula']
             senha = request.form['login_password']
 
-            sql = "SELECT senha, nome, tipo, carga_horaria, tag_professor FROM usuario WHERE matricula = %s"
+            # Agora pegamos o email junto com os outros dados
+            sql = "SELECT senha, nome, tipo, carga_horaria, tag_professor, email FROM usuario WHERE matricula = %s"
             cursor.execute(sql, (matricula,))
             resultado = cursor.fetchone()
 
@@ -98,10 +99,15 @@ def fazer_login():
                 tipo_banco = resultado[2]
                 carga_horaria = resultado[3]
                 tag_professor = resultado[4]
+                email_banco = resultado[5]  # novo
+
                 if bcrypt.checkpw(senha.encode('utf-8'), senha_hash.encode('utf-8')):
+                    session['email'] = email_banco  # salva email na sessão
+                    session['matricula'] = matricula
+                    session['carga_horaria'] = carga_horaria
+                    session['tag_professor'] = tag_professor
+
                     if tipo_banco == 'prof':
-                        session['matricula'] = matricula
-                        session['carga_horaria'] = carga_horaria
                         if carga_horaria is None and tag_professor is None:
                             return render_template('definir_carga_horaria.html')
                         return render_template('home_p.html', nome_banco=nome_banco)
@@ -205,7 +211,6 @@ def carga_horaria():
         return render_template('home_p.html')
 
     return render_template('definir_carga_horaria.html')
-
 
 
 @app.route('/listar_alunos', methods=['GET'])
@@ -344,10 +349,10 @@ def justificar_falta():
                     # Inserir notificação usando matrícula do professor
                     sql_insert = '''
                         INSERT INTO chamada_escolar.notificacoes 
-                        (aluno, matricula_aluno, justificativa, matricula_professor_destinado) 
-                        VALUES (%s, %s, %s, %s)
+                        (aluno, matricula_aluno, justificativa, matricula_professor_destinado,email) 
+                        VALUES (%s, %s, %s, %s, %s)
                     '''
-                    valores = (nome_aluno, matricula_aluno, justificativa, matricula_professor)
+                    valores = (nome_aluno, matricula_aluno, justificativa, matricula_professor, email_professor)
                     cursor.execute(sql_insert, valores)
                     conexao.commit()
 
@@ -369,6 +374,7 @@ def justificar_falta():
     msg = 'Erro inesperado!'
     return render_template('home_a.html', msg=msg)
 
+
 @app.route('/homepage', methods=['GET', 'POST'])
 def home_professor():
     return render_template('home_p.html')
@@ -388,18 +394,18 @@ def mostrar_notificacoes():
         )
         cursor = conexao.cursor()
 
-        sql = 'SELECT aluno, matricula_aluno, justificativa, matricula_professor_destinado,email FROM notificacoes WHERE email = %s'
+        # Usa o email salvo na sessão para filtrar as notificações
+        sql = 'SELECT aluno, matricula_aluno, justificativa, matricula_professor_destinado FROM notificacoes WHERE email = %s'
         cursor.execute(sql, (session.get('email'),))
         resultado = cursor.fetchall()
 
         if resultado:
-            for aluno, matricula_aluno, justificativa, matricula_professor_destinado,email in resultado:
+            for aluno, matricula_aluno, justificativa, matricula_professor_destinado in resultado:
                 notificacao = {
                     'aluno': aluno,
                     'matricula_aluno': matricula_aluno,
                     'justificativa': justificativa,
-                    'matricula_professor_destinado': matricula_professor_destinado,
-                    'email': email
+                    'matricula_professor_destinado': matricula_professor_destinado
                 }
                 notificacoes.append(notificacao)
 
