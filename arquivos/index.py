@@ -249,7 +249,7 @@ def listar_alunos():
                     'matricula': matricula,
                     'tag': tag,
                     'presenca': f'{presenca:.2f}',
-                    'falta': f'{num_aulas - presenca:.0f}',
+                    'falta': f'{presenca:.0f}',
                     'total_de_aulas':f'{num_aulas:.0f}',
                     'num_aulas': num_aulas,
                     'percentual': percentual
@@ -403,7 +403,7 @@ def mostrar_notificacoes():
             for aluno, matricula_aluno, justificativa, matricula_professor_destinado in resultado:
                 notificacao = {
                     'aluno': aluno,
-                    'matricula_aluno': matricula_aluno,
+                    'matricula_aluno': matricula_aluno, 
                     'justificativa': justificativa,
                     'matricula_professor_destinado': matricula_professor_destinado
                 }
